@@ -8,30 +8,34 @@
   <h2>🐱 Cat Videos</h2>
   <div id="results"></div>
 
-  <script>
-    const API_KEY = "AIzaSyC_98L0TNXKqZADRD8WnIxK_Hei3YA9YFA";
-    const url = `https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=3&q=cats&type=video&key=${API_KEY}`;
+  <script src="https://apis.google.com/js/api.js"></script>
+<script>
+  function loadClient() {
+    gapi.client.setApiKey("YOUR_API_KEY");
+    return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest")
+        .then(function() { console.log("GAPI client loaded for API"); },
+              function(err) { console.error("Error loading GAPI client for API", err); });
+  }
 
-    fetch(url)
-      .then(response => response.json())
-      .then(data => {
-        const results = document.getElementById('results');
-        data.items.forEach(video => {
-          const videoId = video.id.videoId;
-          const title = video.snippet.title;
-          const thumbnail = video.snippet.thumbnails.medium.url;
-          const html = `
-            <div>
-              <h3>${title}</h3>
-              <iframe width="320" height="180"
-                src="https://www.youtube.com/embed/${videoId}"
-                frameborder="0" allowfullscreen></iframe>
-            </div>
-          `;
-          results.innerHTML += html;
-        });
-      })
-      .catch(error => console.error('Error:', error));
-  </script>
+  function execute() {
+    return gapi.client.youtube.search.list({
+      "part": [
+        "snippet"
+      ],
+      "maxResults": 3,
+      "q": "cats"
+    })
+    .then(function(response) {
+      console.log("Response", response);
+    },
+    function(err) { console.error("Execute error", err); });
+  }
+
+  gapi.load("client", loadClient);
+</script>
+
+<button onclick="execute()">execute</button>
+
+
 </body>
 </html>
